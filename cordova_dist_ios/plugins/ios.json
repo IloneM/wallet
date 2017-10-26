@@ -1,0 +1,38 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "files": {}
+    },
+    "installed_plugins": {
+        "cordova-plugin-console": {
+            "PACKAGE_NAME": "org.monnaieleman.wallet"
+        },
+        "cordova-plugin-file": {
+            "PACKAGE_NAME": "org.monnaieleman.wallet"
+        },
+        "cordova-plugin-device": {
+            "PACKAGE_NAME": "org.monnaieleman.wallet"
+        },
+        "cordova-plugin-inappbrowser": {
+            "PACKAGE_NAME": "org.monnaieleman.wallet"
+        },
+        "phonegap-plugin-barcodescanner": {
+            "CAMERA_USAGE_DESCRIPTION": " ",
+            "PACKAGE_NAME": "org.monnaieleman.wallet"
+        },
+        "cordova-plugin-whitelist": {
+            "PACKAGE_NAME": "org.monnaieleman.wallet"
+        },
+        "ionic-plugin-keyboard": {
+            "PACKAGE_NAME": "org.monnaieleman.wallet"
+        }
+    },
+    "dependent_plugins": {
+        "cordova-plugin-compat": {
+            "PACKAGE_NAME": "org.monnaieleman.wallet"
+        }
+    }
+}

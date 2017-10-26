@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="mewApp">
+<head>
+ <link rel="icon" 
+      type="image/png" 
+      href="./images/lem.png" />
+  <meta charset="utf-8">
+  <title>e-leman</title>
+  <link rel="canonical" href="https://api.monnaie-leman.org/" />
+  <meta name="description" content="e-leman">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/etherwallet-master.min.css">
+  <script type="text/javascript" src="js/etherwallet-static.min.js"></script>
+  <script type="text/javascript" src="js/etherwallet-master-min.js"></script>
+  
+  <script src="cordova.js"></script>
+  <script src="js/zlib.js"></script> 
+  <script src="js/png.js"></script> 
+  <script src="js/jspdf.min.js"></script> 
+  <script src="js/standard_fonts_metrics.js"></script>
+  
+  <link rel="apple-touch-icon" sizes="60x60" href="images/fav/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="images/fav/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="images/fav/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="images/fav/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/fav/apple-touch-icon-180x180.png">
+  <link rel="icon" type="image/png" href="images/fav/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="images/fav/favicon-194x194.png" sizes="194x194">
+  <link rel="icon" type="image/png" href="images/fav/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="images/fav/android-chrome-192x192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="images/fav/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="images/fav/manifest.json">
+  <link rel="shortcut icon" href="images/favicon.ico">
+  
+  <script type="application/javascript" src="js/fastclick.js"></script> 
+  <script type="application/javascript">
+	    window.addEventListener('load', function () {
+		    FastClick.attach(document.body);
+	    }, false);
+  </script> 
+  <script type="application/javascript">
+	    cordova.plugins.Keyboard.disableScroll(true);
+  </script>
+  
+  <!--
+  <script src="js/qrcode.js"></script>
+  <script src="js/qrscan.js"></script>  
+  
+
+  <script src="js/angular-local-storage.js"></script>-->
+  
+  <meta name="msapplication-TileColor" content="#2e4868">
+  <meta name="msapplication-TileImage" content="images/fav/mstile-144x144.png">
+  <meta name="msapplication-config" content="images/fav/browserconfig.xml">
+  <meta name="theme-color" content="#2e4868">
+</head>
+
+<body>
+  
+   <header ng-controller='tabsCtrl' model="0">
+
+ 
+     <a class="glassPaneMenu" ng-show="dropdown" ng-click="dropdown = !dropdown"> </a>
+<div style="display:block;height:20px;width:100%;"></div>
+  <section class="container bg-gradient">
+       <div class="row" >
+        <div  style="width:49%; display:inline-block;">
+          <img src="images/icon-view.svg" height="40px" width="auto" />  
+          <img src="images/etherwallet-logo.png" height="40px" width="auto" />
+        </div>
+        <div  style="width:49%;display:inline-block;margin-top:3px;">
+        
+          <span class="dropdown"  style="float:right;color:black;">
+          <a href="#" class="dropdown-toggle" ng-click="dropdown = !dropdown" style="color:black;"> {{curLang}} <span class="caret"></span></a>
+       
+
+          <ul class="dropdown-menu pos_dropDown" ng-show="dropdown"  id="lg_mn">fr,Français</ul>
+          
+          <!--       
+            <li style="display:none;"><a ng-class="{true:'active'}[curLang=='Français']" ng-click="changeLanguage('fr','Français')" >Français</a></li>           
+            <li style="display:none;"><a ng-class="{true:'active'}[curLang=='Deutsch']" ng-click="changeLanguage('de','Deutsch')" >Deutsch</a></li>
+            <li style="display:none;"><a ng-class="{true:'active'}[curLang=='Italiano']" ng-click="changeLanguage('it','Italiano')" >Italiano</a></li>
+            <li style="display:none;"><a ng-class="{true:'active'}[curLang=='English']" ng-click="changeLanguage('en','English')" >English</a></li>  
+            -->
+
+          </span>
+          <span translate="Version" style="float:right;"></span>
+        </div>
+       </div>
+        
+  </section>
+  
+  
+   
+
+  <section class="container nav-container overflowing" >
+    <a ng-show="showLeftArrow" class="nav-arrow-left" ng-click="scrollLeft(100);" ng-mouseover="scrollHoverIn(true,2);" ng-mouseleave="scrollHoverOut()">&#171;</a>
+    <div class="nav-scroll">
+      <nav class="nav-inner">
+        
+        
+        
+        <span ng-repeat="tab in tabNames track by $index" class="nav-item" ng-class="{active: $index==activeTab}" 
+             
+             ng-show="{{tab.readOnly}}" ng-click="tabClick($index)"> <a title="{{tab.name | translate}}" class="{{tab.cssClass}}" ></a></span>
+       
+        
+      </nav>
+    </div>
+    <a ng-show="showRightArrow" class="nav-arrow-right" ng-click="scrollRight(100);" ng-mouseover="scrollHoverIn(false,2);" ng-mouseleave="scrollHoverOut()">&#187;</a>
+  </section>
+
+ <div class="modal fade" id="switchPop" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <label translate="STR_Lock_wallet_title">Lock</label>
+                              <p>
+                                <button type="button" class="btn btn-primary"  ng-click="lockWallet()" translate="STR_Lock_wallet">Lock </button>
+                              </p>
+                              
+                              <label translate="STR_Switch_title">Switch</label>
+                              <div style="height:350px;overflow-y:scroll;">
+                                <table width="95%">
+	                               <tr  ng-repeat="wal in other_wallets track by $index" class="tr_trans">
+	                                    <td  >
+                                        <a ng-click="switchToWallet(wal.address)" style="color:black;">
+                                            {{wal.name}}
+                                        </a>
+                                         </td>
+                                         <td  width="100px"  >
+                                         <a ng-click="switchToWallet(wal.address)">
+                                             <div class="identiconWrapper" style="max-width:60px;">
+                                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="0x{{wal.address}}"  watch-var="other_wallets" ></div>
+                                             </div>
+                                             </a>
+                                         </td>
+	                               </tr>
+                                 </table>
+                                </div>
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="STR_LockCancel">Annuler </button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+
+
+</header>
+ 
+
+
+
+
+<br />
+
+<section class="container" style="min-height: 50%" ng-controller='viewCtrl'>
+
+  <div class="tab-content" >
+
+        <!-- Storage-->
+    <div class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.openFromStorage.id">
+      
+     
+       
+       <div ng-controller='storageCtrl'>
+         <div class="row grp"> 
+         
+         
+         
+         <div class="col-md-12 " ng-hide="isApp">
+             <div class="row "> 
+               <div class="col-md-12">
+                 <label translate="STR_WarningBrowser" >warning browser</label>
+                 <p translate="STR_WarningQuestion" >warning browser</p>
+                 <p><input type="radio" ng-model="private_cmp" value="0" ng-value="0" ng-click="changePrivate();"> {{"STR_No"| translate }} &nbsp;&nbsp; <input type="radio" ng-model="private_cmp" value="1" ng-value="1" ng-click="changePrivate();"> {{"STR_Yes"| translate }}</p> 
+                 <p ng-hide="private_cmp" ng-bind-html="'STR_logout' | translate">  </p>
+              
+                
+               </div>
+             </div>
+          </div>
+           <div class="col-md-12 ">
+             <div class="row "> 
+               <div class="col-md-2">
+                 <label translate="STR_yourWallets" >Vos portefeuilles :</label>
+               </div>
+             </div>
+             
+            
+             <div class="row "> 
+               <div class="col-md-12 ">
+                  <table width="100%">
+                    <tr  ng-show="NoWallet" class="tr_trans">
+                         <td >
+                           <p translate="STR_NoWallet" >no wallet</p>
+                         </td>
+                    <tr>
+	                <tr  ng-repeat="wal in wallets track by $index" class="tr_trans">
+	                    <td  >
+                        <a ng-click="openWallet(wal.address)" style="color:black;">
+                            {{wal.name}}
+                        </a>
+                         </td>
+                         <td  width="100px"  >
+                         <a ng-click="openWallet(wal.address)">
+                             <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="0x{{wal.address}}"  watch-var="wallets" ></div>
+                             </div>
+                             </a>
+                         </td>
+                        <td  width="50px;" >
+                             <a class="btn btn-info btn-block" ng-click="editWall(wal.address,wal.name)"  translate="CTC_edit"> edit </a>
+                        </td>
+                        <td  width="50px;" >
+                             <a class="btn btn-info btn-block" ng-click="deleteWall(wal.address)"  translate="STR_forget"> forget </a>
+                        </td>
+                        
+	               </tr>
+                 </table>
+               </div>
+             </div>
+           
+           </div>
+         </div>
+           <!-- delete Modal -->
+         <div class="modal fade" id="deleteWallet" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <p><label translate="STR_confirmDelete">delete wallet</label></p>
+                              
+                               <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="0x{{currentAddress}}"  watch-var="currentAddress" ></div>
+                             </div>
+                             <br/><br/>
+                             
+                             <p translate="STR_warning">warning</p>
+                               <p><label translate="STR_Backup">Do a backup</label></p>
+                                 <!-- add save buttons -->
+                      
+                  <a class="btn btn-info btn-block" href="{{blobEnc}}" download="LEM_0x{{currentAddress}}.dat" translate="VIEW_Save" ng-if="!isApp"> Télécharger la Sauvegarde </a>
+                  <a class="btn btn-info btn-block" ng-click="dowloadAppFile()"  translate="VIEW_Save" ng-if="isApp"> Télécharger la Sauvegarde </a>
+              
+                          </h4>
+                      </div>
+                      
+                      
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_deleteCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="deleteWallet()" translate="STR_forgetConfirm">Forget</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+          <div class="modal fade" id="editWall" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <p><label translate="STR_editName">Change name</label></p>
+                               <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="0x{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                               <input class="form-control" type="text" ng-model="currName" />
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_editNameCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveName()" translate="CTC_editNameSave">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+     
+
+         <div class="glassPane" ng-hide="ready"> </div>
+         <div class="waitingMsg" translate="GP_Wait" ng-hide="ready"> </div>
+       </div>
+ 
+   </div>
+
+
+    
+   <!-- Ouverture d'un portefeuille -->
+    <section class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.openWallet.id" ng-controller='decryptWalletCtrl'>
+     <div class="row grp" >
+       <div class="col-md-12 ">
+         <div class="row "> 
+           <div class="col-md-12 ">
+              <label translate="OPEN_Choose_bak" >Selectionner une sauvegarde:</label>
+           </div>
+         </div>
+         <div class="row "> 
+           <div class="col-md-12 ">
+              <input style="display:none;" type="file" on-read-file="showContent($fileContent)" id="fselector"/>
+              <a class="file-input btn btn-block btn-default btn-file marg-v-sm btn-primary" ng-click="openFileDialog()" translate="OPEN_Choose_file" >Choisir un fichier... </a>
+              <a class="file-input btn btn-block btn-default btn-file marg-v-sm btn-primary" ng-click="startScanPaperWallet()" translate="OPEN_Scan_back" ng-if="isApp">Scan d'une sauvegarde papier... </a>
+              <div id="fuploadStatus" ng-bind-html="fileStatus"></div>
+           </div>
+         </div>
+         <div class="row " > 
+           <div class="col-md-12 ">
+              <label id="uploadbtntxt-wallet" ng-show="showFDecrypt" translate="OPEN_Access"> Acc&eacute;der &agrave; votre portefeuille:</label>
+            </div>
+         </div>
+         <div class="row " > 
+           <div class="col-md-12 ">    
+              <a class="btn btn-primary btn-block btnAction" ng-show="showFDecrypt" ng-click="openFile();" translate="OPEN_Open">Ouvrir le portefeuille</a>
+              <div ng-bind-html="decryptStatus"></div>
+           </div>
+         </div>
+       </div>
+     </div>
+     
+       <div class="modal fade" id="pickWalletFile" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content"> 
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                          
+                           <label translate="FILE_pickWallet">Wallet File</label>
+                           <div style="height:350px;overflow-y:scroll;"> 
+                           <table width="95%">
+                             <tr  ng-repeat="entry in dir_entries track by $index" class="tr_trans">
+	                          <td  ng-click="pickWallFile(entry.name,$index)"  > 
+	                               <div ng-hide="entry.hasAddress"> <img src="images/file.png" height="40" width="40" ng-hide="entry.hasAddress"></img>    &nbsp;{{entry.name}}</div>
+	                              <div class="identiconWrapper" style="max-width:60px;" ng-show="entry.hasAddress">
+                                    <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{entry.address}}"  watch-var="dir_entries" ></div>
+                                  </div>
+                             
+                                  <textarea cols="15" rows="3" class="adrtxtSml" readonly="readonly" ng-show="entry.hasAddress" ng-model="entry.address" > </textarea>
+	                            </td>
+	                         </tr>
+                            </table>
+                            </div>
+                             <label translate="FILE_selectedFile" ng_hide="SelectedFileIndex==-1">Wallet File</label>
+                           <p> {{SelectedFileName}}</p>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_editNameCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="openWallFile()" translate="FILE_open" ng_hide="SelectedFileIndex==-1">open</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+     
+     
+  </section>
+    <!-- / Ouverture d'un portefeuille -->
+    
+    
+
+    <!-- view wallet info -->
+  
+    <div class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.viewWalletInfo.id">
+     
+      
+        <div  ng-controller='viewWalletCtrl' ng-controller='lemanCtrl'>
+     
+     
+            <blocked-account-drtv> </blocked-account-drtv>
+     
+            <section class="row" >
+              <div class="col-md-12 ">
+                  <div class="row grp"> 
+                   <div class="col-md-12 ">
+                      <label translate="TRAN_Address" >Votre adresse :</label>
+                   </div>
+                   <div  class="col-md-6 col-xs-6">
+                      <div class="identiconWrapper">
+                        <div id="addressIdenticon" title="Address Indenticon" blockie-address="{{currentAddress}}" watch-var="currentAddress"></div>
+                      </div>
+                   </div>
+                   <div  class="col-md-6 col-xs-6">
+                      <textarea cols="9" rows="5" class="adrtxt" readonly="readonly">{{currentAddress}} </textarea>
+                   </div>
+                  </div>
+              </div>
+            </section>
+        
+            <section class="row" >
+              <div class="col-md-12 ">
+                <div class="row grp"> 
+                   <div class="col-md-12 ">
+                      <label translate="VIEW_QR" >QR Code de votre portefeuille :</label>
+                   </div>
+                   <div class="col-md-12 qr_wrap ">
+                     
+                     <div id="qr_qdd" qr-code="{{currentAddress}}" watch-var="currentAddress" width="100%" style=" max-width: 250px; margin-right:auto; margin-left:auto;" id="adr_div"></div>
+                     
+                     
+                     
+                   </div>
+                   <div class="col-md-12 ">
+                     &nbsp;
+                   </div>
+                   <div class="col-md-12" ng-if="!isApp" >
+                        <a class="btn btn-info btn-block" ng-click="printAdr()"  translate="VIEW_print_adr" > Imprimer votre adressse </a>
+                   </div>
+              </div>
+            </section> 
+        </div>
+    </div>
+    <!-- /view wallet info -->
+    
+  
+
+
+        <!-- Account balance and limits-->
+    <div class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.limites.id">
+      
+        
+      
+         <div  ng-controller='balanceCtrl'>
+     
+     
+         <blocked-account-drtv> </blocked-account-drtv>
+
+         <section class="row" >
+          <div class="col-md-10 col-xs-10 totBal grp">
+                 {{token.balance| number : 2}} {{ 'CUR' | translate }}
+                 <button type="button" class="btn btn-primary" style="padding: 2px 10px;" ng-click="refreshBal()" translate="TRA_Refresh">Refresh </button>
+          </div>
+         </section>
+         
+         <section class="row" >
+          <div class="col-md-12 ">
+              <div class="row grp"> 
+               
+               <div class="col-md-6 col-xs-6">
+                 <label translate="TRAN_Address" >Votre adresse :</label>
+               </div>
+                <div class="col-md-6 col-xs-6">
+                
+                  <a class="btn btn-primary bellowmargin option_btn" ng-click="openOptions()"  >&nbsp; </a>
+                
+                  <a type="button" class="btn btn-primary bellowmargin file_btn" href="{{blobEnc}}" download="{{ 'CUR' | translate }}_{{currentWalletAddress}}.dat"  ng-if="!isApp">&nbsp; </a>
+                  <a class="btn btn-primary bellowmargin file_btn" ng-click="dowloadAppFile()"  ng-if="isApp">&nbsp; </a>
+                  <a class="btn btn-primary bellowmargin qr_btn" ng-click="printQRCode()"  ng-if="!isApp">&nbsp; </a>
+                </div>
+                
+                
+               <div  class="col-md-6 col-xs-6">
+                  <div class="identiconWrapper">
+                    <div id="addressIdenticon" title="Address Indenticon" blockie-address="{{currentWalletAddress}}" watch-var="currentWalletAddress"></div>
+                  </div>
+               </div>
+               <div  class="col-md-6 col-xs-6">
+                  <textarea cols="9" rows="5" class="adrtxt" disabled>{{currentWalletAddress}} </textarea>
+               </div>
+              </div>
+          </div>
+         </section>
+         
+         <section class="row" >
+	      <div class="col-md-12 ">
+	       <div class="row grp"> 
+            <div  class="col-md-12"> 
+	             <label translate="BAL_balances" >Votre balance :</label>
+            </div> 
+           
+            <div  class="col-md-12">  
+                <div class="balance-item">{{ 'CUR_nanti' | translate }}:</div>
+                <div class="balance-amount text-primary">{{token.balanceEL| number : 2}} {{ 'CUR' | translate }}</div>
+            </div> 
+         
+           
+            <div  class="col-md-12">  
+                    <div class="balance-item">{{ 'CUR_credit_mut' | translate }}:</div>
+                    <div class="balance-amount text-primary">{{token.balanceCM| number : 2}} {{ 'CUR' | translate }}</div>
+            </div> 
+         
+  
+           </div>
+           
+          
+           <div class="row grp">    
+             <div class="col-md-12">             
+	             <label translate="LIM_limites" >Vos limites de </label>&nbsp;<label translate="CUR_credit_mut" > CM</label><label >:</label>
+             </div> 
+             <div  class="col-md-12">  
+                    <div class="balance-item">{{ 'LIM_credit' | translate }}</div>
+                    <div class="balance-amount text-primary">{{token.limitCMp| number : 2}} {{ 'CUR' | translate }}</div>
+             </div> 
+             <div  class="col-md-12">  
+                    <div class="balance-item">{{ 'LIM_debit' | translate }}</div>
+                    <div class="balance-amount text-primary">{{token.limitCMm| number : 2}} {{ 'CUR' | translate }}</div>
+             </div>
+           </div>
+        
+          </div>
+         </section>
+         
+         <section class="row" >  
+    
+          <div id="qrcode_print"></div>
+       </section>
+       
+       
+       <div class="over_tab" id="delegation_tab"> 
+          <div class="col-md-12 ">
+         <section class="row" >  
+          <div class="col-md-12 ">
+	       <div class="row grp"> 
+	         <div  class="col-md-12">  
+	            <label translate="DELEG_Delegate_Tab_Title"></label>
+	            <button type="button" class="btn btn-primary" ng-click="closeDelegation()" style="float:right;" translate="DELEG_CloseTab">Close</button>
+	             <!--<button type="button" class="btn btn-primary" style="float:right; margin-right:10px;"   ng-click="refreshDel()" translate="TRA_Refresh">Refresh </button>-->
+	   
+	          </div>
+	          <div  class="col-md-12">  
+	          
+	          <br/> 
+	           <div class="row "> 
+	            <div  class="col-md-12"> 
+	             <div id="transDelStatus" ></div>
+	            </div>
+               <div class="col-md-5 col-xs-5">
+                 &nbsp;
+               </div>
+                <div class="col-md-7 col-xs-7">
+                  <button type="button" class="btn btn-primary bellowmargin" ng-click="delegateHelp()" translate="DELEG_help">?</button>
+                  <button type="button" class="btn btn-primary bellowmargin"  ng-click="addDelegPop()" translate="DELEG_add">Add </button>
+                
+               </div>
+               </div>
+	             
+	              
+	           <div class="row "> 
+               <div class="col-md-12 ">
+                  <table width="100%" >
+                    <tr  ng-show="noDelegation" class="tr_trans">
+                         <td >
+                           <p translate="DELEG_noDeleg" >no delegation</p>
+                         </td>
+                    <tr>
+	                <tr  ng-repeat="dg in delegations track by $index" class="tr_trans">
+	                  
+                         <td  width="100px">
+                             <div class="identiconWrapper without_text_tr" ng-class="{'with_text_tr': dg.name!=''}">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{dg.address}}"  watch-var="delegations" ></div>
+                             </div>
+                             <div style="color:black; max-height:21px; overflow:hidden; text-align:center;">{{dg.name}}</div>
+                         </td>
+                         
+                        <td >
+                            <textarea cols="9" rows="5" class="adrtxtSml" readonly="readonly" style="overflow:hidden;">{{dg.address}}</textarea>
+                        </td>
+                       
+                        <td >
+                            {{dg.amount}} {{ 'CUR' | translate }}
+                        </td>
+                       <td width="50px;">
+                              <a class="btn btn-primary btn-block"  ng-click="editDeleg(dg)"  translate="CTC_edit" >edit</a>
+                        </td>
+                        <td width="50px;">
+                             <a class="btn btn-info btn-block" ng-click="deleteDeleg(dg)"  translate="CTC_delete"> delete </a>
+                        </td>
+                        
+	               </tr>
+	                 <tr ng-show="noMoreDelegation" class="tr_trans">
+                     <td colspan="5">
+                        <p translate="DELEG_NoMore" >Pas Plus</p>
+                     </td>
+	               </tr>
+                 </table>
+               </div>
+             </div>
+	             
+	         <div class="row "> 
+               <div class="col-md-col-md-6 col-xs-6 ">
+                  <a class="btn btn-info btn-block" id="prevDeleg" ng-click="prevDeleg()"  translate="DELEG_prev" > Ajouter </a>
+               </div>
+               <div class="col-md-col-md-6 col-xs-6 ">
+                  <a class="btn btn-info btn-block" id="nextDeleg" ng-click="nextDeleg()"  translate="DELEG_next" > Ajouter </a>
+               </div>
+             </div>     
+	             
+	             
+	             
+	             
+	          </div>
+	        </div>
+	      </div>       
+        </section> 
+	      </div>        
+       </div>
+       
+      
+          <!-- Delegation Help -->
+         <div class="modal fade" id="delegation_help_pop" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content"> 
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="DELEG_Delegate_Help_title">Delegate:</label></p>
+                           <p translate="DELEG_Delegate_Help_text"></p>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-primary" data-dismiss="modal" translate="DELEG_Close">CLose </button>
+                      </div>
+                  </div>
+              </div>
+        </div>  
+        
+         <!-- add delegation Modal -->
+         <div class="modal fade" id="addDelegation" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="DELEG_Add_Deleg">Choose address</label></p>
+                           <p translate="DELEG_chooseAddress">Choose address</p>
+                           
+                           
+                            <p>
+                            <button type="button" class="btn btn-primary"  ng-click="contactPop()" translate="CTC_pick">ContactPop </button>
+                            </p>
+                   
+                   
+                
+                           
+                           
+                           
+                           
+                            <div class="identiconWrapper" style="max-width:100px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" ng-click="startScanToAddress()" blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                             <textarea cols="9" rows="5" class="adrtxt" placeholder="{{'ID_placeholder' | translate}}" ng-model="curraddress" ng-change="getCttName()"> </textarea>
+                             <div ng-bind-html="selectedName" style="overflow:hidden;text-align:center;max-height:21px"></div>
+                             <p>&nbsp;</p>
+                             <p translate="DELEG_set_Limit">Set Limit</p>
+                               <input class="form-control" type="text"  placeholder="0.00" ng-model="currDelLimit" style="width:50%;margin-left:25%;" />
+                              <p>&nbsp;</p>
+                              <p translate="DELEG_Enter_pass">Entrez votre mot de passe</p><br/>
+                                 <input class="form-control" type="password"  placeholder="{{ 'DCRY_Placeholder_psw' | translate }}" ng-model="trPass" style="width:50%;margin-left:25%;"/>
+                                 <div id="delStatus" ></div></p>
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="DELEG_cancel_Deleg">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveNewDeleg()" translate="DELEG_Save_Deleg">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+        
+          <!-- edit delegation Modal -->
+         <div class="modal fade" id="editDelegation" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="DELEG_Edit_Deleg">Choose address</label></p>
+                           <p translate="DELEG_Address"> address</p>
+                           
+                           
+                            <div class="identiconWrapper" style="max-width:100px;">
+                                 <div id="addressIdenticon" title="Address Indenticon"  blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                             <textarea cols="9" rows="5" readonly="readonly" class="adrtxt" placeholder="{{'ID_placeholder' | translate}}" ng-model="curraddress" ng-change="getCttName()"> </textarea>
+                             <div ng-bind-html="selectedName" style="overflow:hidden;text-align:center;max-height:21px"></div>
+                             <p>&nbsp;</p>
+                             <p translate="DELEG_set_Limit">Set Limit</p>
+                               <input class="form-control" type="text"  placeholder="0.00" ng-model="currDelLimit" style="width:50%;margin-left:25%;" id="del_lim_ed_p"/>
+                              <p>&nbsp;</p>
+                              <p translate="DELEG_Enter_pass">Entrez votre mot de passe</p><br/>
+                                 <input class="form-control" type="password" placeholder="{{ 'DCRY_Placeholder_psw' | translate }}" ng-model="trPass" style="width:50%;margin-left:25%;"/>
+                                 <div id="delEditStatus" ></div></p>
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="DELEG_cancel_Deleg">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveEditDeleg()" translate="DELEG_Save_Deleg">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+         <!-- delete delegation Modal -->
+         <div class="modal fade" id="deleteDelegation" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="DELEG_Delete_Deleg">Choose address</label></p>
+                           <p translate="DELEG_Address"> address</p>
+                           
+                           
+                            <div class="identiconWrapper" style="max-width:100px;">
+                                 <div id="addressIdenticon" title="Address Indenticon"  blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                             <textarea cols="9" rows="5" readonly="readonly" class="adrtxt" placeholder="{{'ID_placeholder' | translate}}" ng-model="curraddress" ng-change="getCttName()"> </textarea>
+                             <div ng-bind-html="selectedName" style="overflow:hidden;text-align:center;max-height:21px"></div>
+                             <p>&nbsp;</p>
+                            
+                              <p translate="DELEG_Enter_pass">Entrez votre mot de passe</p><br/>
+                                 <input class="form-control" type="password" placeholder="{{ 'DCRY_Placeholder_psw' | translate }}" ng-model="trPass" style="width:50%;margin-left:25%;"/>
+                                 <div id="delDeleteStatus" ></div></p>
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="DELEG_Delete_cancel_Deleg">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveDeleteDeleg()" translate="DELEG_Delete_conf_Deleg">Supprimer</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+        
+        
+        
+        
+         <div class="over_tab" id="allowance_tab"> 
+          <div class="col-md-12 ">
+         <section class="row" >  
+          <div class="col-md-12 ">
+	       <div class="row grp"> 
+	         <div  class="col-md-12">  
+	            <label translate="ALLOW_Allowance_Tab_Title"></label>
+	            <button type="button" class="btn btn-primary" ng-click="closeAllowance()" style="float:right;" translate="ALLOW_CloseTab">Close</button>
+	             <!--<button type="button" class="btn btn-primary" style="float:right; margin-right:10px;"   ng-click="refreshAllowance()" translate="TRA_Refresh">Refresh </button>-->
+	   
+	          </div>
+	          <div  class="col-md-12">  
+	           <br/> 
+	          
+	           <div class="row "> 
+	            <div  class="col-md-12"> 
+	             <div id="transAllowStatus" ></div>
+	            </div>
+               <div class="col-md-5 col-xs-5">
+                 &nbsp;
+               </div>
+                <div class="col-md-7 col-xs-7">
+                  <button type="button" class="btn btn-primary bellowmargin" ng-click="allowanceHelp()" translate="ALLOW_help">?</button>
+                  <button type="button" class="btn btn-primary bellowmargin"  ng-click="addAllowPop()" translate="ALLOW_add">Add </button>
+                
+               </div>
+               </div>
+	             
+	              
+	          <div class="row "> 
+               <div class="col-md-12 ">
+                  <table width="100%" >
+                    <tr  ng-show="noAllowance" class="tr_trans">
+                         <td >
+                           <p translate="ALLOW_noAllow" >no delegation</p>
+                         </td>
+                    <tr>
+	                <tr  ng-repeat="al in allowances track by $index" class="tr_trans">
+	                  
+                         <td  width="100px">
+                             <div class="identiconWrapper without_text_tr" ng-class="{'with_text_tr': al.name!=''}">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{al.address}}"  watch-var="allowances" ></div>
+                             </div>
+                             <div style="color:black; max-height:21px; overflow:hidden; text-align:center;">{{al.name}}</div>
+                         </td>
+                         
+                        <td >
+                            <textarea cols="9" rows="5" class="adrtxtSml" readonly="readonly" style="overflow:hidden;">{{al.address}}</textarea>
+                        </td>
+                       
+                        <td >
+                            {{al.amount}} {{ 'CUR' | translate }}
+                        </td>
+                        <td width="50px;">
+                             <a class="btn btn-info btn-block" ng-click="deleteAllow(al)"  translate="CTC_delete"> delete </a>
+                        </td>
+                        
+	               </tr>
+	                <tr ng-show="noMoreAllowance" class="tr_trans">
+                     <td colspan="5">
+                        <p translate="Allow_NoMore" >Pas Plus</p>
+                     </td>
+	               </tr>
+                 </table>
+               </div>
+             </div>
+	             
+	         <div class="row "> 
+               <div class="col-md-col-md-6 col-xs-6 ">
+                  <a class="btn btn-info btn-block" id="prevAllow" ng-click="prevAllow()"  translate="DELEG_prev" > Ajouter </a>
+               </div>
+               <div class="col-md-col-md-6 col-xs-6 ">
+                  <a class="btn btn-info btn-block" id="nextAllow" ng-click="nextAllow()"  translate="DELEG_next" > Ajouter </a>
+               </div>
+             </div>     
+	              
+	             
+	             
+	             
+	             
+	          </div>
+	        </div>
+	      </div>       
+        </section> 
+	      </div>        
+       </div>
+       
+      
+          <!-- Allowance Help -->
+         <div class="modal fade" id="allowance_help_pop" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel" data-backdrop="static" data-keyboard="false">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content"> 
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="ALLOW_Allowance_Help_title">Delegate:</label></p>
+                           <p translate="ALLOW_Allowance_Help_text"></p>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-primary" data-dismiss="modal" translate="ALLOW_Close">CLose </button>
+                      </div>
+                  </div>
+              </div>
+        </div>  
+        
+        
+         <!-- add allowance Modal -->
+         <div class="modal fade" id="addAllowance" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="ALLOW_Add_Allow">Choose address</label></p>
+                           <p translate="ALLOW_chooseAddress">Choose address</p>
+                           
+                           
+                            <p>
+                            <button type="button" class="btn btn-primary"  ng-click="contactPop()" translate="CTC_pick">ContactPop </button>
+                            </p>
+                   
+                            <div class="identiconWrapper" style="max-width:100px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" ng-click="startScanToAddress()" blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                             <textarea cols="9" rows="5" class="adrtxt" placeholder="{{'ID_placeholder' | translate}}" ng-model="curraddress" ng-change="getCttName()"> </textarea>
+                             <div ng-bind-html="selectedName" style="overflow:hidden;text-align:center;max-height:21px"></div>
+                             <p>&nbsp;</p>
+                             <p translate="ALLOW_set_Amount">Set Amount</p>
+                               <input class="form-control" type="text"  placeholder="0.00" ng-model="currAllowAmount" style="width:50%;margin-left:25%;" />
+                              <p>&nbsp;</p>
+                              <p translate="ALLOW_Enter_pass">Entrez votre mot de passe</p><br/>
+                                 <input class="form-control" type="password" placeholder="{{ 'DCRY_Placeholder_psw' | translate }}" ng-model="trPass" style="width:50%;margin-left:25%;"/>
+                                 <div id="allowStatus" ></div></p>
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="ALLOW_cancel_Allowance">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveNewAllow()" translate="ALLOW_Save_Allowance">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+        
+        
+        
+        
+        
+            <!-- edit allowance Modal -->
+         <div class="modal fade" id="editAllowance" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="ALLOW_Edit_Allowance">Choose address</label></p>
+                           <p translate="ALLOW_Address"> address</p>
+                           
+                           
+                            <div class="identiconWrapper" style="max-width:100px;">
+                                 <div id="addressIdenticon" title="Address Indenticon"  blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                             <textarea cols="9" rows="5" readonly="readonly" class="adrtxt" placeholder="{{'ID_placeholder' | translate}}" ng-model="curraddress" ng-change="getCttName()"> </textarea>
+                             <div ng-bind-html="selectedName" style="overflow:hidden;text-align:center;max-height:21px"></div>
+                             <p>&nbsp;</p>
+                             <p translate="ALLOW_set_Amount">Set Limit</p>
+                               <input class="form-control" type="text"  placeholder="0.00" ng-model="currAllowAmount" style="width:50%;margin-left:25%;" id="all_amount_p"/>
+                              <p>&nbsp;</p>
+                              <p translate="ALLOW_Enter_pass">Entrez votre mot de passe</p><br/>
+                                 <input class="form-control" type="password" placeholder="{{ 'DCRY_Placeholder_psw' | translate }}" ng-model="trPass" style="width:50%;margin-left:25%;"/>
+                                 <div id="allowEditStatus" ></div></p>
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="ALLOW_cancel_Allowance">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveEditAllowance()" translate="ALLOW_Save_Allowance">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+         <!-- delete allowance Modal -->
+         <div class="modal fade" id="deleteAllowance" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="ALLOW_Delete_Allowance">Choose address</label></p>
+                           <p translate="ALLOW_Address"> address</p>
+                           
+                           
+                            <div class="identiconWrapper" style="max-width:100px;">
+                                 <div id="addressIdenticon" title="Address Indenticon"  blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                             <textarea cols="9" rows="5" readonly="readonly" class="adrtxt" placeholder="{{'ID_placeholder' | translate}}" ng-model="curraddress" ng-change="getCttName()"> </textarea>
+                             <div ng-bind-html="selectedName" style="overflow:hidden;text-align:center;max-height:21px"></div>
+                             <p>&nbsp;</p>
+                            
+                              <p translate="ALLOW_Enter_pass">Entrez votre mot de passe</p><br/>
+                                 <input class="form-control" type="password" placeholder="{{ 'DCRY_Placeholder_psw' | translate }}" ng-model="trPass" style="width:50%;margin-left:25%;"/>
+                                 <div id="allowDeleteStatus" ></div></p>
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="ALLOW_Delete_cancel_Allowance">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveDeleteAllowance()" translate="ALLOW_Delete_conf_Allowance">Supprimer</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+        
+      <div class="pop_pane" style="z-index:12;"   ng-click="closeCttPop()" ng-show="showContactPop">
+      <div class="ctt_pop" style="z-index:13;" ng-show="showContactPop">
+          <div class="ctt_cent">
+              <div ng-show="NoCtc" translate="CTC_noContacts"></div>
+                  <div  ng-repeat="ct in contacts track by $index" class="ctt_elm">
+                      <div>
+                          <div  ng-click="pickCtc(ct.address,ct.name,'deleg')">
+                              <div class="identiconWrapper" style="max-width:60px;" >
+                                  <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{ct.address }}"  watch-var="contacts" ></div>
+                              </div>
+                              <div class="ctt_txt">{{ct.name}}&nbsp;</div>
+                          </div>
+                       </div>
+                   </div>
+               </div>
+           </div>      
+       </div>
+       
+       
+       
+          <!-- confirm  -->
+        <div class="modal fade" id="conf_pop"  style="z-index:400;" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-body">
+                          <h4 align="center">
+                              
+                              <label ng-bind-html="confStatus"</label>
+                          
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-primary" data-dismiss="modal" translate="TRAN_OK">Fermer</button>
+                          
+                      </div>
+                  </div>
+              </div>
+        </div>  
+        
+        
+<!-- option Modal -->
+         <div class="modal fade" id="option_pop" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="OPT_title">Option</label></p>
+                           <p translate="OPT_record_password">Password</p>
+                           
+                          <p><input type="radio" ng-model="delay" value="0">
+                            <span translate="OPT_zero"></span>
+                          </p>
+                           <p><input type="radio" ng-model="delay" value="120">
+                            <span translate="OPT_two_min"></span>
+                          </p>
+                           <p><input type="radio" ng-model="delay" value="300">
+                            <span translate="OPT_five_min"></span>
+                          </p>
+                           <p><input type="radio" ng-model="delay" value="900">
+                            <span translate="OPT_15_min"></span>
+                          </p>
+                           <p><input type="radio" ng-model="delay" value="3600">
+                            <span translate="OPT_hour"></span>
+                          </p>
+                           
+                           
+                          <p ng-hide="delay==0">&nbsp;</p>
+                           
+                           <p ng-hide="delay==0"><label translate="OPT_warning"></label></p>
+                           
+                           
+                           
+                          <p>&nbsp;</p>
+                              <p translate="OPT_Enter_pass">Entrez votre mot de passe</p><br/>
+                                 <input class="form-control" type="password"  placeholder="{{ 'DCRY_Placeholder_psw' | translate }}" ng-model="trPass" style="width:50%;margin-left:25%;"/>
+                                 <div id="optStatus" ></div></p>
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="DELEG_cancel_Deleg">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveOption()" translate="DELEG_Save_Deleg">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+           
+        <waiting-drtv></waiting-drtv> 
+</div>
+<!-- / The Leman -->
+
+
+</div>
+<!-- / The DAO Proposals -->
+
+    
+        <!-- Transactions-->
+    <div class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.transactions.id">
+      
+      
+       
+       <div ng-controller='transactionsCtrl'>
+         <div class="row grp"> 
+           <div class="col-md-12 ">
+             <div class="row "> 
+               <div class="col-md-4 col-xs-4">
+                 <label translate="TRA_Transactions" >Vos transactions :</label>
+               </div>
+                <div class="col-md-4 col-xs-4">
+                  <span translate="TRA_handle_memo"></span>
+       
+                  <button type="button" class="btn btn-primary bellowmargin"  ng-click="exportMemos()" translate="CTC_export_mem" >Export </button>
+                  
+
+                   
+             
+
+                  
+                  
+                  
+               </div>
+               <div class="col-md-4 col-xs-4">
+                  
+                 
+                   <span translate="TRA_Number"></span>
+                  <input type="number" rstep="1" min="1" max="20" ng-model="requested_tra_number"></input> 
+                  <button type="button" class="btn btn-primary bellowmargin"  ng-click="refreshTrans()" translate="TRA_Refresh">Refresh </button>
+               
+               </div>
+             </div>
+             <div class="row "> 
+               <div class="col-md-12 ">
+                  <table width="100%">
+                    <tr class="tr_trans">
+                     <td>
+                        <span translate="TRA_Date"></span>
+                     </td>
+                     <td>
+                        <span translate="TRA_TranId"></span>
+                     </td>
+                     <td>
+                        <span translate="TRA_Memo"></span>
+                     </td>
+                     <td colspan="2">
+                        <span translate="TRA_Part"></span>
+                     </td>
+                     <td style="text-align: right;">
+                        <span  translate="TRA_Got"></span>
+                     </td>
+                     <td style="text-align: right;">
+                        <span  translate="TRA_Paid"></span>
+                     </td>
+                      <td>
+                     </td>
+	               </tr>
+	               
+	               <tr ng-show="showNone" class="tr_trans">
+                     <td colspan="8">
+                        <p translate="TRA_NoTrans" >Aucunes</p>
+                     </td>
+	               </tr>
+	               
+	                <tr  ng-repeat="tran in transactions track by $index" class="tr_trans">
+	                    <td>
+	                         {{tran.data.TIME*1000 | date : 'yyyy-MM-dd HH:mm' }}
+	                    </td>
+	                    <td> 
+	                       <a ng-click="openDetails(tran.id)" style="color:black;">
+                           <textarea cols="15" rows="5" class="adrtxtSml" readonly="readonly">{{tran.data.HASH }} </textarea>
+                           </a>
+                       </td>
+                       
+                       <td >
+                           <a ng-click="openDetails(tran.id)" style="color:black;">
+	                          <div style="max-height:5em; max-width:200px;overflow:hidden;" >{{tran.data.memo }} </div> 
+	                       </a>
+                       </td>
+                       
+                       
+	     
+                         <td ng-show="tran.data._FROM==currentWalletAddress" width="100px">
+                            <a ng-click="addCtc(tran.data._TO)"> 
+                             <div class="identiconWrapper without_text_tr" ng-class="{'with_text_tr': tran.data.to_name!=''}">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{tran.data._TO }}"  watch-var="transactions" ></div>
+                             </div>
+                             <div style="color:black; max-height:21px; overflow:hidden; text-align:center;">{{tran.data.to_name }}</div>
+                             </a>
+                         </td>
+                         <td ng-show="tran.data._TO==currentWalletAddress" width="100px">
+                          <a ng-click="addCtc(tran.data._FROM)"> 
+	                        <div class="identiconWrapper without_text_tr" ng-class="{'with_text_tr': tran.data.from_name!=''}" >
+                                 <div id="addressIdenticon" title="Address Indenticon"  img="1" blockie-address="{{tran.data._FROM }}"  watch-var="transactions"></div>
+                             </div>
+                             <div style="color:black; max-height:21px; overflow:hidden; text-align:center;">{{tran.data.from_name }}</div>
+                          </a>
+                         </td>
+                          <td ng-show="tran.data._FROM==currentWalletAddress" class="tdPlus500">
+                            <textarea cols="9" rows="5" class="adrtxtSml" readonly="readonly">{{tran.data._TO }} </textarea>
+                         </td>
+                         <td ng-show="tran.data._TO==currentWalletAddress" class="tdPlus500">
+	                        <textarea cols="9" rows="5" class="adrtxtSml" readonly="readonly">{{tran.data._FROM }} </textarea>
+                       </td>
+                      
+                       <td   style="text-align: right;">
+                       <span  ng-show="tran.data._TO==currentWalletAddress">{{ tran.data.AMOUNT/100. | number : 2}}</span>
+                       </td>
+                        <td   style="text-align: right;"> 
+                        <span  class="paid" ng-show="tran.data._FROM==currentWalletAddress">{{ tran.data.AMOUNT/100. | number : 2}}</span>
+                       </td>
+                       <td   > 
+                        <span >{{ tran.data.currency}}</span>
+                       </td>
+	               </tr>
+	               <tr class="tr_trans">
+                     <td colspan="4">
+                       
+                     </td>
+                     <td >
+                       <span translate="TRA_tot_column"></span>
+                     </td>
+                     <td style="text-align: right;">
+                       {{ tot_in/100. | number : 2}}
+                     </td>
+                     <td class="paid" style="text-align: right;" >
+                       {{ tot_out/100. | number : 2}}
+                     </td>
+                      <td >
+                     </td>
+	               </tr>
+	               <tr ng-show="showNoMore" class="tr_trans">
+                     <td colspan="8">
+                        <p translate="TRA_NoMore" >Pas Plus</p>
+                     </td>
+	               </tr>
+                 </table>
+               </div>
+             </div>
+             <div class="row "> 
+               <div class="col-md-col-md-6 col-xs-6 ">
+                  <a class="btn btn-info btn-block" id="prevTransactions" ng-click="prevTransactions()"  translate="TRA_prev" > Ajouter </a>
+               </div>
+               <div class="col-md-col-md-6 col-xs-6 ">
+                  <a class="btn btn-info btn-block" id="addTransactions" ng-click="addTransactions()"  translate="TRA_add" > Ajouter </a>
+               </div>
+             </div>
+           </div>
+         </div>
+         
+         <!-- add Modal -->
+         <div class="modal fade" id="addContact" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                          <p>
+                              <label translate="CTC_confirmAdd" ng-show="indctc==-1">Add name</label>
+                              <label translate="CTC_AlreadyAdded" ng-hide="indctc==-1">already added</label>
+                           </p>
+                                <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                              <p translate="CTC_withName"  ng-show="indctc==-1">Add name</p>
+                              <p translate="CTC_updateName" ng-hide="indctc==-1">update name</p>
+                              <input class="form-control" type="text" ng-model="currName" />
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_addCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveContact()" translate="CTC_addConfirm" ng-show="indctc==-1">Add</button>
+                          <button type="button" class="btn btn-primary" ng-click="saveContact()" translate="CTC_updateConfirm" ng-hide="indctc==-1">Update</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+         <div class="modal fade" id="transDetails" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-body">
+                          <h4 align="center">
+                            <label translate="TRA_details_title">Transaction details</label><br/>
+                            <textarea cols="21" rows="3" class="adrtxt" readonly="readonly" ng-model="selectedTrans.HASH" > </textarea>
+                            <p><span translate="TRA_details_block">Transaction block</span> {{selectedTrans.BLOCK}}</p>
+                            <p><span translate="TRA_details_date">Transaction block</span> {{selectedTrans.TIME*1000 | date : 'yyyy-MM-dd HH:mm' }}</p>
+                            <p><span translate="TRA_details_amount"></span> {{ selectedTrans.AMOUNT/100. | number : 2}} {{selectedTrans.currency}}</p>
+                            <p ng-show="selectedTrans._FROM==currentWalletAddress"> 
+                                 <span translate="TRA_Paid" class="paid"></span> &nbsp;
+                                 <span translate="TRA_To"></span> {{selectedTrans.to_name }}
+                                 <span> 
+                                     <div ng-show="selectedTrans._FROM==currentWalletAddress" class="identiconWrapper without_text_tr">
+                                        <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{selectedTrans._TO }}"  watch-var="selectedTrans" ></div>
+                                     </div>
+                                 </span>
+                                 <textarea cols="9" rows="5" class="adrtxtSml" readonly="readonly" ng-show="selectedTrans._FROM==currentWalletAddress" >{{selectedTrans._TO }} </textarea>
+                                 
+                            </p>
+                            
+                            <p ng-show="selectedTrans._TO==currentWalletAddress">
+                                  <span translate="TRA_Got" class="get"></span>&nbsp;
+                                  <span translate="TRA_From"></span> {{selectedTrans.from_name }}
+                                  <span> 
+                                      <div  ng-show="selectedTrans._TO==currentWalletAddress" class="identiconWrapper without_text_tr"  >
+                                        <div id="addressIdenticon" title="Address Indenticon"  img="1" blockie-address="{{selectedTrans._FROM }}"  watch-var="selectedTrans"></div>
+                                      </div>
+                                  </span>
+                                  <textarea cols="9" rows="5" class="adrtxtSml" readonly="readonly" ng-show="selectedTrans._TO==currentWalletAddress">{{selectedTrans._FROM }} </textarea>
+                                  
+                            </p>
+                            <p translate="TRA_memo">Memo</p>
+                            <textarea cols="21" rows="4" id="current_trans_memo" ng-model="current_trans_memo" ></textarea>
+                            
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-primary" ng-click="closeDetails()" translate="TRA_Close">Fermer </button>
+                         
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+          <!-- export Modal -->
+         <div class="modal fade" id="exportTraPop" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <label translate="TRA_Export_title">Import</label>
+                             
+                              <p translate="TRA_Export_date"></p>
+                              
+                              <p >   <input type="date" ng-model="start_date"> <span translate="TRA_Export_date_to"></span>  <input type="date" ng-model="end_date"></p>
+                               
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_editNameCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary"  ng-click="ExportTra()" translate="CTC_Export">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+        
+ 
+         <div class="modal fade" id="approval_help_pop" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel" ></div>  
+          <div class="modal fade" id="pending_help_pop" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel" ></div>
+          <div class="modal fade" id="acceptRequestPay" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel" ></div>
+          <div class="modal fade" id="reject_Request" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel" ></div>
+          <div class="modal fade" id="conf_request" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel" ></div>
+          <div class="modal fade" id="conf_diss" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel" ></div>
+    
+
+         <div class="glassPane" ng-hide="ready"> </div>
+         <div class="waitingMsg" ng-hide="ready">{{"GP_Wait" | translate}} <button type="button" class="btn btn-primary bellowmargin"  onclick="location.reload();" translate="TRA_Refresh">Refresh </button></div>
+       </div>
+ 
+   </div>
+
+    
+        <!-- Transactions-->
+    <div class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.contacts.id">
+       
+       
+        <div ng-controller='contactsCtrl'>
+     
+     
+         <div class="row grp"> 
+           <div class="col-md-12 ">
+             <div class="row "> 
+               <div class="col-md-5 col-xs-5">
+                 <label translate="CTC_yourContacts" >Vos contacts :</label>
+               </div>
+                <div class="col-md-7 col-xs-7">
+                  <button type="button" class="btn btn-primary bellowmargin"  ng-click="addNamePop()" translate="CTC_add">Add </button>
+                  <a type="button" class="btn btn-primary bellowmargin" href="{{blobCtc}}" download="eLeman_Contacts.dat"  translate="CTC_export" ng-if="!isApp">Export </a>
+                  <button type="button" class="btn btn-primary bellowmargin"  ng-click="exportCtc()" translate="CTC_export" ng-if="isApp">Export </button>
+                  
+              
+                  <button type="button" class="btn btn-primary bellowmargin"  ng-click="openImportCtc()" translate="CTC_import">Import </button>
+               </div>
+             </div>
+             
+            
+             <div class="row "> 
+               <div class="col-md-12 ">
+                  <table width="100%" >
+                    <tr  ng-show="NoCtc" class="tr_trans">
+                         <td >
+                           <p translate="CTC_noContacts" >no contacts</p>
+                         </td>
+                    <tr>
+	                <tr  ng-repeat="ct in contacts track by $index" class="tr_trans">
+	                  
+                         <td  width="100px">
+                             <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{ct.address }}"  watch-var="contacts" ></div>
+                             </div>
+                         </td>
+                         
+                        <td >
+                            {{ct.name}}
+                        </td>
+                       
+                        <td width="50px;">
+                              <a class="btn btn-primary btn-block"  ng-click="editCtc(ct.address,ct.name)"  translate="CTC_edit" >edit</a>
+                        </td>
+                        <td width="50px;">
+                             <a class="btn btn-info btn-block" ng-click="deleteCtc(ct.address,ct.name)"  translate="CTC_delete"> delete </a>
+                        </td>
+                        
+	               </tr>
+                 </table>
+               </div>
+             </div>
+           
+           </div>
+         </div>
+           <!-- delete Modal -->
+         <div class="modal fade" id="deleteContact" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <p><label translate="CTC_confirmDelete">delete name</label></p>
+                               <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div><br/>
+                             {{currName}}
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_deleteCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="deleteContact()" translate="CTC_deleteConfirm">Delete</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+         <!-- add Modal -->
+         <div class="modal fade" id="addName" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="CTC_Add_ctc">Choose address</label></p>
+                           <p translate="CTC_chooseAddress">Choose address</p>
+                            <div class="identiconWrapper" style="max-width:100px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" ng-click="startScanToAddress()" blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                             <textarea cols="9" rows="5" class="adrtxt" placeholder="{{'ID_placeholder' | translate}}" ng-model="curraddress"> </textarea>
+                             <p translate="CTC_chooseName">Choose name</p>
+                               <input class="form-control" type="text" ng-model="currName" />
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_addNameCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveNewName()" translate="CTC_addNameSave">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+       
+           <!-- edit Modal -->
+         <div class="modal fade" id="editName" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <p><label translate="CTC_editName">Change name</label></p>
+                               <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                               <input class="form-control" type="text" ng-model="currName" />
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_editNameCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveName()" translate="CTC_editNameSave">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+       <!-- / Send Modal -->
+       
+       
+       
+           <!-- import Modal -->
+         <div class="modal fade" id="importCtcPop" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <label translate="CTC_Import_title">Import</label>
+                              <input style="display:none;" type="file" on-read-file="openCtcFile($fileContent)" id="fctcselector"/>
+                              <p>
+                                <button type="button" class="btn btn-primary"  ng-click="selectCtcFile()" translate="CTC_SelectFile">Import </button>
+                              </p>
+                              <p ng-hide="file_number==-1" ng-bind-html="current_file"> </p>
+                              
+                              <p  ng-hide="file_number==-1"  >{{file_number}} <span translate="CTC_Import_FileNumber">Local </span></p> 
+                              <p>{{loacl_number}} <span translate="CTC_Import_localNumber">Local </span></p> 
+                              <span ng-show="conflict_number!=0" >
+                                <p>{{conflict_number}} <span translate="CTC_Import_Conflict">Conflict </span></p> 
+                            
+                                <label translate="CTC_Import_merge">Import</label>
+                                <p><input type="radio" ng-model="merge_type" value="0" ng-value="0"> {{"CTC_Merge_their"| translate }}</p>
+                                <p> <input type="radio" ng-model="merge_type" value="1" ng-value="1"> {{"CTC_Merge_mine"| translate }}</p> 
+                              </span>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_editNameCancel">Annuler </button>
+                          <button type="button" ng-hide="file_number<1" class="btn btn-primary" ng-click="importCtc()" translate="CTC_Import_save">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+       <!-- / Send Modal -->
+       
+       <div class="modal fade" id="pickContactFile" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-body">
+                          <h4 align="center">
+                          
+                           <label translate="FILE_pickContact">Contact File</label>
+                           <div style="height:350px;overflow-y:scroll;"> 
+                           <table width="95%">
+                             <tr  ng-repeat="entry in dir_entries track by $index" class="tr_trans">
+	                          <td  ng-click="pickCtcFile(entry.name,$index)"  > <img src="images/file.png" height="20" width="20"></img> &nbsp;{{entry.name}} </td>
+	                         </tr>
+                            </table>
+                            </div>
+                             <label translate="FILE_selectedFile" ng_hide="SelectedFileIndex==-1">Contact File</label>
+                           <p> {{SelectedFileName}}</p>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" ng-click="cancelCtcPickedFile()" translate="CTC_editNameCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="openCtcPickedFile()" translate="FILE_open" ng_hide="SelectedFileIndex==-1">open</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+         
+
+         <div class="glassPane" ng-hide="ready"> </div>
+         <div class="waitingMsg" translate="GP_Wait" ng-hide="ready"> </div>
+       </div>
+ 
+   </div>
+
+
+    <div class="tab-pane active"  ng-controller='viewCtrl'  >
+    <!-- Ecran initial: creation du porte-feuille -->
+    <div ng-if="globalService.currentTab==globalService.tabs.help1.id">
+     <div class="row grp" > 
+      <div class="col-md-12 ">
+       <div class="row "> 
+        <div class="col-md-12 "> 
+         <div ng-bind-html="'HELP_1' | translate"></div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   <div ng-if="globalService.currentTab==globalService.tabs.help2.id">
+     <div class="row grp" > 
+      <div class="col-md-12 ">
+       <div class="row "> 
+        <div class="col-md-12 "> 
+         <div ng-bind-html="'HELP_2' | translate"></div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+</div>
+
+
+
+
+    
+  </div>
+  
+</section>
+

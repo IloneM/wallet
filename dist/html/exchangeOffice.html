@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="mewApp">
+<head>
+ <link rel="icon" 
+      type="image/png" 
+      href="./images/lem.png" />
+  <meta charset="utf-8">
+  <title>e-leman</title>
+  <link rel="canonical" href="https://api.monnaie-leman.org/" />
+  <meta name="description" content="e-leman">
+  <meta name="author" content="">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" href="css/etherwallet-master.min.css">
+  <script type="text/javascript" src="js/etherwallet-static.min.js"></script>
+  <script type="text/javascript" src="js/etherwallet-master-min.js"></script>
+  
+  <script src="cordova.js"></script>
+  <script src="js/zlib.js"></script> 
+  <script src="js/png.js"></script> 
+  <script src="js/jspdf.min.js"></script> 
+  <script src="js/standard_fonts_metrics.js"></script>
+  
+  <link rel="apple-touch-icon" sizes="60x60" href="images/fav/apple-touch-icon-60x60.png">
+  <link rel="apple-touch-icon" sizes="76x76" href="images/fav/apple-touch-icon-76x76.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="images/fav/apple-touch-icon-120x120.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="images/fav/apple-touch-icon-152x152.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="images/fav/apple-touch-icon-180x180.png">
+  <link rel="icon" type="image/png" href="images/fav/favicon-32x32.png" sizes="32x32">
+  <link rel="icon" type="image/png" href="images/fav/favicon-194x194.png" sizes="194x194">
+  <link rel="icon" type="image/png" href="images/fav/favicon-96x96.png" sizes="96x96">
+  <link rel="icon" type="image/png" href="images/fav/android-chrome-192x192.png" sizes="192x192">
+  <link rel="icon" type="image/png" href="images/fav/favicon-16x16.png" sizes="16x16">
+  <link rel="manifest" href="images/fav/manifest.json">
+  <link rel="shortcut icon" href="images/favicon.ico">
+  
+  <script type="application/javascript" src="js/fastclick.js"></script> 
+  <script type="application/javascript">
+	    window.addEventListener('load', function () {
+		    FastClick.attach(document.body);
+	    }, false);
+  </script> 
+  <script type="application/javascript">
+	    cordova.plugins.Keyboard.disableScroll(true);
+  </script>
+  
+  <!--
+  <script src="js/qrcode.js"></script>
+  <script src="js/qrscan.js"></script>  
+  
+
+  <script src="js/angular-local-storage.js"></script>-->
+  
+  <meta name="msapplication-TileColor" content="#2e4868">
+  <meta name="msapplication-TileImage" content="images/fav/mstile-144x144.png">
+  <meta name="msapplication-config" content="images/fav/browserconfig.xml">
+  <meta name="theme-color" content="#2e4868">
+</head>
+
+<body>
+   <header ng-controller='tabsCtrl' model="5">
+  
+
+ 
+     <a class="glassPaneMenu" ng-show="dropdown" ng-click="dropdown = !dropdown"> </a>
+<div style="display:block;height:20px;width:100%;"></div>
+  <section class="container bg-gradient">
+       <div class="row" >
+        <div  style="width:49%; display:inline-block;">
+           
+          <img src="images/etherwallet-logo.png" height="40px" width="auto" />
+        </div>
+        <div  style="width:49%;display:inline-block;margin-top:3px;">
+        
+          <span class="dropdown"  style="float:right;color:black;">
+          <a href="#" class="dropdown-toggle" ng-click="dropdown = !dropdown" style="color:black;"> {{curLang}} <span class="caret"></span></a>
+       
+
+          <ul class="dropdown-menu pos_dropDown" ng-show="dropdown"  id="lg_mn">fr,Français</ul>
+          
+          <!--       
+            <li style="display:none;"><a ng-class="{true:'active'}[curLang=='Français']" ng-click="changeLanguage('fr','Français')" >Français</a></li>           
+            <li style="display:none;"><a ng-class="{true:'active'}[curLang=='Deutsch']" ng-click="changeLanguage('de','Deutsch')" >Deutsch</a></li>
+            <li style="display:none;"><a ng-class="{true:'active'}[curLang=='Italiano']" ng-click="changeLanguage('it','Italiano')" >Italiano</a></li>
+            <li style="display:none;"><a ng-class="{true:'active'}[curLang=='English']" ng-click="changeLanguage('en','English')" >English</a></li>  
+            -->
+
+          </span>
+          <span translate="Version" style="float:right;"></span>
+        </div>
+       </div>
+        
+  </section>
+  
+  
+   
+
+  <section class="container nav-container overflowing" >
+    <a ng-show="showLeftArrow" class="nav-arrow-left" ng-click="scrollLeft(100);" ng-mouseover="scrollHoverIn(true,2);" ng-mouseleave="scrollHoverOut()">&#171;</a>
+    <div class="nav-scroll">
+      <nav class="nav-inner">
+        
+        
+        
+        
+        <span ng-repeat="tab in tabNames track by $index" class="nav-item" ng-class="{active: $index==activeTab}" 
+             
+             ng-show="{{tab.exchangeOffice}}" ng-click="tabClick($index)"> <a title="{{tab.name | translate}}" class="{{tab.cssClass}}" ></a></span>
+       
+      </nav>
+    </div>
+    <a ng-show="showRightArrow" class="nav-arrow-right" ng-click="scrollRight(100);" ng-mouseover="scrollHoverIn(false,2);" ng-mouseleave="scrollHoverOut()">&#187;</a>
+  </section>
+
+ <div class="modal fade" id="switchPop" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <label translate="STR_Lock_wallet_title">Lock</label>
+                              <p>
+                                <button type="button" class="btn btn-primary"  ng-click="lockWallet()" translate="STR_Lock_wallet">Lock </button>
+                              </p>
+                              
+                              <label translate="STR_Switch_title">Switch</label>
+                              <div style="height:350px;overflow-y:scroll;">
+                                <table width="95%">
+	                               <tr  ng-repeat="wal in other_wallets track by $index" class="tr_trans">
+	                                    <td  >
+                                        <a ng-click="switchToWallet(wal.address)" style="color:black;">
+                                            {{wal.name}}
+                                        </a>
+                                         </td>
+                                         <td  width="100px"  >
+                                         <a ng-click="switchToWallet(wal.address)">
+                                             <div class="identiconWrapper" style="max-width:60px;">
+                                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="0x{{wal.address}}"  watch-var="other_wallets" ></div>
+                                             </div>
+                                             </a>
+                                         </td>
+	                               </tr>
+                                 </table>
+                                </div>
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="STR_LockCancel">Annuler </button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+
+
+</header>
+ 
+
+
+
+
+<br />
+
+<section class="container" style="min-height: 50%" ng-controller='viewCtrl'>
+
+  <div class="tab-content" >
+
+        <!-- Storage-->
+    <div class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.openFromStorage.id">
+      
+     
+       
+       <div ng-controller='storageCtrl'>
+         <div class="row grp"> 
+         
+         
+         
+         <div class="col-md-12 " ng-hide="isApp">
+             <div class="row "> 
+               <div class="col-md-12">
+                 <label translate="STR_WarningBrowser" >warning browser</label>
+                 <p translate="STR_WarningQuestion" >warning browser</p>
+                 <p><input type="radio" ng-model="private_cmp" value="0" ng-value="0" ng-click="changePrivate();"> {{"STR_No"| translate }} &nbsp;&nbsp; <input type="radio" ng-model="private_cmp" value="1" ng-value="1" ng-click="changePrivate();"> {{"STR_Yes"| translate }}</p> 
+                 <p ng-hide="private_cmp" ng-bind-html="'STR_logout' | translate">  </p>
+              
+                
+               </div>
+             </div>
+          </div>
+           <div class="col-md-12 ">
+             <div class="row "> 
+               <div class="col-md-2">
+                 <label translate="STR_yourWallets" >Vos portefeuilles :</label>
+               </div>
+             </div>
+             
+            
+             <div class="row "> 
+               <div class="col-md-12 ">
+                  <table width="100%">
+                    <tr  ng-show="NoWallet" class="tr_trans">
+                         <td >
+                           <p translate="STR_NoWallet" >no wallet</p>
+                         </td>
+                    <tr>
+	                <tr  ng-repeat="wal in wallets track by $index" class="tr_trans">
+	                    <td  >
+                        <a ng-click="openWallet(wal.address)" style="color:black;">
+                            {{wal.name}}
+                        </a>
+                         </td>
+                         <td  width="100px"  >
+                         <a ng-click="openWallet(wal.address)">
+                             <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="0x{{wal.address}}"  watch-var="wallets" ></div>
+                             </div>
+                             </a>
+                         </td>
+                        <td  width="50px;" >
+                             <a class="btn btn-info btn-block" ng-click="editWall(wal.address,wal.name)"  translate="CTC_edit"> edit </a>
+                        </td>
+                        <td  width="50px;" >
+                             <a class="btn btn-info btn-block" ng-click="deleteWall(wal.address)"  translate="STR_forget"> forget </a>
+                        </td>
+                        
+	               </tr>
+                 </table>
+               </div>
+             </div>
+           
+           </div>
+         </div>
+           <!-- delete Modal -->
+         <div class="modal fade" id="deleteWallet" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <p><label translate="STR_confirmDelete">delete wallet</label></p>
+                              
+                               <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="0x{{currentAddress}}"  watch-var="currentAddress" ></div>
+                             </div>
+                             <br/><br/>
+                             
+                             <p translate="STR_warning">warning</p>
+                               <p><label translate="STR_Backup">Do a backup</label></p>
+                                 <!-- add save buttons -->
+                      
+                  <a class="btn btn-info btn-block" href="{{blobEnc}}" download="LEM_0x{{currentAddress}}.dat" translate="VIEW_Save" ng-if="!isApp"> Télécharger la Sauvegarde </a>
+                  <a class="btn btn-info btn-block" ng-click="dowloadAppFile()"  translate="VIEW_Save" ng-if="isApp"> Télécharger la Sauvegarde </a>
+              
+                          </h4>
+                      </div>
+                      
+                      
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_deleteCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="deleteWallet()" translate="STR_forgetConfirm">Forget</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+          <div class="modal fade" id="editWall" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                              <p><label translate="STR_editName">Change name</label></p>
+                               <div class="identiconWrapper" style="max-width:60px;">
+                                 <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="0x{{curraddress }}"  watch-var="curraddress" ></div>
+                             </div>
+                               <input class="form-control" type="text" ng-model="currName" />
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_editNameCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="saveName()" translate="CTC_editNameSave">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+        
+     
+
+         <div class="glassPane" ng-hide="ready"> </div>
+         <div class="waitingMsg" translate="GP_Wait" ng-hide="ready"> </div>
+       </div>
+ 
+   </div>
+
+
+    
+   <!-- Ouverture d'un portefeuille -->
+    <section class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.openWallet.id" ng-controller='decryptWalletCtrl'>
+     <div class="row grp" >
+       <div class="col-md-12 ">
+         <div class="row "> 
+           <div class="col-md-12 ">
+              <label translate="OPEN_Choose_bak" >Selectionner une sauvegarde:</label>
+           </div>
+         </div>
+         <div class="row "> 
+           <div class="col-md-12 ">
+              <input style="display:none;" type="file" on-read-file="showContent($fileContent)" id="fselector"/>
+              <a class="file-input btn btn-block btn-default btn-file marg-v-sm btn-primary" ng-click="openFileDialog()" translate="OPEN_Choose_file" >Choisir un fichier... </a>
+              <a class="file-input btn btn-block btn-default btn-file marg-v-sm btn-primary" ng-click="startScanPaperWallet()" translate="OPEN_Scan_back" ng-if="isApp">Scan d'une sauvegarde papier... </a>
+              <div id="fuploadStatus" ng-bind-html="fileStatus"></div>
+           </div>
+         </div>
+         <div class="row " > 
+           <div class="col-md-12 ">
+              <label id="uploadbtntxt-wallet" ng-show="showFDecrypt" translate="OPEN_Access"> Acc&eacute;der &agrave; votre portefeuille:</label>
+            </div>
+         </div>
+         <div class="row " > 
+           <div class="col-md-12 ">    
+              <a class="btn btn-primary btn-block btnAction" ng-show="showFDecrypt" ng-click="openFile();" translate="OPEN_Open">Ouvrir le portefeuille</a>
+              <div ng-bind-html="decryptStatus"></div>
+           </div>
+         </div>
+       </div>
+     </div>
+     
+       <div class="modal fade" id="pickWalletFile" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content"> 
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                          
+                           <label translate="FILE_pickWallet">Wallet File</label>
+                           <div style="height:350px;overflow-y:scroll;"> 
+                           <table width="95%">
+                             <tr  ng-repeat="entry in dir_entries track by $index" class="tr_trans">
+	                          <td  ng-click="pickWallFile(entry.name,$index)"  > 
+	                               <div ng-hide="entry.hasAddress"> <img src="images/file.png" height="40" width="40" ng-hide="entry.hasAddress"></img>    &nbsp;{{entry.name}}</div>
+	                              <div class="identiconWrapper" style="max-width:60px;" ng-show="entry.hasAddress">
+                                    <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{entry.address}}"  watch-var="dir_entries" ></div>
+                                  </div>
+                             
+                                  <textarea cols="15" rows="3" class="adrtxtSml" readonly="readonly" ng-show="entry.hasAddress" ng-model="entry.address" > </textarea>
+	                            </td>
+	                         </tr>
+                            </table>
+                            </div>
+                             <label translate="FILE_selectedFile" ng_hide="SelectedFileIndex==-1">Wallet File</label>
+                           <p> {{SelectedFileName}}</p>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="CTC_editNameCancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="openWallFile()" translate="FILE_open" ng_hide="SelectedFileIndex==-1">open</button>
+                      </div>
+                  </div>
+              </div>
+        </div>
+     
+     
+  </section>
+    <!-- / Ouverture d'un portefeuille -->
+    
+    
+
+    <!-- view wallet info -->
+  
+    <div class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.viewWalletInfo.id">
+     
+        <div>
+            <wallet-decrypt-drtv></wallet-decrypt-drtv>
+        </div>
+        
+        <div  ng-show="wallet!=null" ng-controller='viewWalletCtrl' ng-controller='lemanCtrl'>
+     
+     
+     
+            <blocked-account-drtv> </blocked-account-drtv>
+     
+            <section class="row" >
+              <div class="col-md-12 ">
+                  <div class="row grp"> 
+                   <div class="col-md-12 ">
+                      <label translate="TRAN_Address" >Votre adresse :</label>
+                   </div>
+                   <div  class="col-md-6 col-xs-6">
+                      <div class="identiconWrapper">
+                        <div id="addressIdenticon" title="Address Indenticon" blockie-address="{{currentAddress}}" watch-var="currentAddress"></div>
+                      </div>
+                   </div>
+                   <div  class="col-md-6 col-xs-6">
+                      <textarea cols="9" rows="5" class="adrtxt" readonly="readonly">{{currentAddress}} </textarea>
+                   </div>
+                  </div>
+              </div>
+            </section>
+        
+            <section class="row" >
+              <div class="col-md-12 ">
+                <div class="row grp"> 
+                   <div class="col-md-12 ">
+                      <label translate="VIEW_QR" >QR Code de votre portefeuille :</label>
+                   </div>
+                   <div class="col-md-12 qr_wrap ">
+                    
+                     
+                        <div id="qr_qdd" qr-code="{{currentAddressFromWallet}}" watch-var="currentAddressFromWallet" width="100%" style=" max-width: 250px; margin-right:auto; margin-left:auto;" id="adr_div"></div>
+             
+                     
+                     
+                   </div>
+                   <div class="col-md-12 ">
+                     &nbsp;
+                   </div>
+                   <div class="col-md-12" ng-if="!isApp" >
+                        <a class="btn btn-info btn-block" ng-click="printAdr()"  translate="VIEW_print_adr" > Imprimer votre adressse </a>
+                   </div>
+              </div>
+            </section> 
+        </div>
+    </div>
+    <!-- /view wallet info -->
+    
+  
+
+    <!-- Action on another Account-->
+<div class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.exchange.id">
+  <div>
+    <wallet-decrypt-drtv></wallet-decrypt-drtv>
+  </div>
+        
+  <div ng-show="wallet!=null" ng-controller='exchangeCtrl'>
+     <section class="row" ng-hide="is_admin" >
+          <div class="col-md-12 ">
+              <div class="row grp"> 
+                 <div class="col-md-12 ">
+                     <label translate="EXC_Wrong_Acc_Type" >Not Admin</label>
+                  </div>
+              </div>
+          </div>
+      </section>  
+      <section class="row" ng-show="is_admin">
+          <div class="col-md-12 ">
+              <div class="row grp"> 
+                 <div class="col-md-12 ">
+                     <label translate="EXC_Account" >Account :</label>
+                  </div>
+                  
+                  <div  class="col-md-12">
+                    <div class="identiconWrapper">
+                        <div id="addressIdenticon" title="Address Indenticon"  blockie-address="{{selected_account}}"  ng-click="startScanToAddress()" watch-var="selected_account" style="opacity:0.9;"></div>
+                  </div>
+                  <textarea cols="45" rows="1" class="adrtxt" id="toField" placeholder="{{'ID_placeholder' | translate}}" ng-model="selected_account" ng-change="checkSelectedAccount()"> </textarea>
+                  <div ng-bind-html="acc_message" style="text-align:center;font-size:large;"></div>
+               </div>
+                   
+              </div>
+          </div>
+      </section>  
+         
+      <section class="row" ng-show="valid_acc" >
+          <div class="col-md-12 ">
+          
+            <div class="row grp"> 
+              <div  class="col-md-col-md-9 col-xs-9 "> 
+	             <label translate="EXC_balances" >Account balances :</label>
+              </div> 
+              <div class="col-md-col-md-3 col-xs-3 "> 
+                     <!--<a class="btn btn-primary btn-block" ng-click="refresh()" translate="EXC_Refresh">Refresh </a>-->
+              </div>
+     
+              <div  class="col-md-12">
+                <div class="balance-item">{{ 'CUR_nanti' | translate }}</div>
+                <div class="balance-amount text-primary">{{balanceEL| number : 2}} {{ 'CUR' | translate }}</div>
+              </div> 
+    
+      
+              <div  class="col-md-12">  
+                    <div class="balance-item">{{ 'CUR_credit_mut' | translate }}</div>
+                    <div class="balance-amount text-primary">{{balanceCM| number : 2}} {{ 'CUR' | translate }}</div>
+              </div>
+     
+             </div> 
+           
+              <div class="row grp"> 
+              <div> 
+                 <div class="col-md-12 ">
+                     <label translate="EXC_AccStat" >Lock/Unlock Account:</label>  
+                 </div>
+                 <div class="col-md-12 ">
+                    <span class="balance-item"></span><span translate="EXC_LockStatus"></span> {{lock_status}} 
+                 </div>
+                
+              </div> 
+               
+              <div> 
+                 <div class="col-md-12 ">
+                     <label translate="EXC_AccType" >Account Type:</label>  
+                 </div>
+                 <div class="col-md-12 ">
+                    <span class="balance-item"></span> 
+                    {{acc_type_obj.tp_name}}
+                 </div> 
+               
+              </div> 
+            
+               
+           
+   
+              <div   ng-hide="acc_type_obj.is_admin">    
+                <div class="col-md-12">             
+	              <label translate="LIM_limites" >Vos limites de </label>&nbsp;<label translate="CUR_credit_mut" > CM</label><label >:</label>
+                </div> 
+             <div  class="col-md-12 ">  
+                    <span class="balance-item">{{ 'LIM_credit' | translate }}</span>
+                    <span class="text-primary">{{limitCMp}} {{ 'CUR' | translate }}</span> 
+             </div> 
+             <div  class="col-md-12  ">  
+                    <span class="balance-item">{{ 'LIM_debit' | translate }}</span>
+                    <span class="text-primary">{{limitCMm}} {{ 'CUR' | translate }}</span>
+             </div>
+              
+           </div> 
+   
+   
+    <div  class="col-md-col-md-9 col-xs-9 "> 
+    </div>
+    <div class="col-md-col-md-3 col-xs-3 ">
+                 <a class="btn btn-primary btn-block" ng-click="updateAccount()"  translate="EXC_Update"></a>
+              </div>
+     </div>
+    
+           
+            <div class="row grp"  ng-hide="acc_type_obj.is_admin"> 
+                <div class="col-md-12 ">
+                   <label translate="EXC_Credit_1" >Credit</label><label translate="CUR_nanti" >Curr </label>   <label translate="EXC_Credit_2" >on account Account :</label>  
+               </div>
+            
+               <div class="col-md-col-md-9 col-xs-9 ">
+                  <span class="balance-item"  translate="EXC_Credit_prefix" ></span>  <span class="text-primary"> <input type="number" step="0.01" placeholder="0.00" ng-model="credit_amount" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" style="max-width:200px;display: inline-block;"/></span>
+                   <span  class="text-primary" translate="CUR" ></span>
+               </div> 
+               
+               <div class="col-md-col-md-3 col-xs-3 ">
+                  <a class="btn btn-primary btn-block" ng-click="creditAccount()"  translate="EXC_CreditAccount"></a> 
+               </div>
+           </div>
+   
+            
+          </div> 
+      </section> 
+      
+        <!-- Update -->
+         <div class="modal fade" id="update" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body" align="center">
+                          <h4 align="center">
+                           <p><label translate="EXC_Update">Update</label></p>
+                           </h4>
+                           <p><label translate="EXC_LockUnlock">Lock status</label></p> 
+                              <md-radio-group >
+                                  <input type="radio" ng-model="pop_is_lock" name="cb_stat" ng-value="true" id="cb_lock"/> {{ 'EXC_Locked' | translate }} &nbsp;&nbsp;&nbsp;
+                                  <input type="radio" ng-model="pop_is_lock" name="cb_stat" ng-value="false" id="cb_unlock"/> {{ 'EXC_Unlocked' | translate }} 
+                              </md-radio-group>
+                           </p>
+                           <p><label translate="EXC_AccType">Account type</label></p> 
+                              <md-radio-group>
+                                 <input type="radio" ng-model="pop_acc_type" ng-change="typeChanged()" name="cb_type" value="0" id="cb_pers" ng-hide="acc_type_obj.is_admin"/> <span ng-hide="acc_type_obj.is_admin" > {{ 'EXC_Account_Type_physical' | translate }} </span> &nbsp;&nbsp;&nbsp;
+                                 <input type="radio" ng-model="pop_acc_type" ng-change="typeChanged()" name="cb_type" value="1"  id="cb_legal" ng-hide="acc_type_obj.is_admin"/> <span ng-hide="acc_type_obj.is_admin" > {{ 'EXC_Account_Type_legal' | translate }} </span> &nbsp;&nbsp;&nbsp;
+                                 <input type="radio" ng-model="pop_acc_type"  ng-change="typeChanged()" name="cb_type" value="2"  id="cb_admin" ng-show="acc_type_obj.can_admin" />  <span ng-show="acc_type_obj.can_admin"> {{ 'EXC_Account_Type_admin' | translate }} </span>
+                              </md-radio-group>
+                           </p> 
+                           
+      
+                           <p ng-hide="acc_type_obj.is_admin">
+                               <label translate="LIM_limites" >Vos limites de </label>&nbsp;<label translate="CUR_credit_mut" > CM</label><label>:</label>    
+                           </p>                       
+                           <p ng-hide="acc_type_obj.is_admin">
+                            <span class="balance-item">{{ 'LIM_credit' | translate }}</span>   
+                    <span class="text-primary"> <input type="text" id="limitP" min="0" ng-model="pop_limitCMp" ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" value="{{pop_limitCMp}}"/> {{ 'CUR' | translate }}</span>    
+                          </p> 
+                            
+                           <p ng-hide="acc_type_obj.is_admin">
+      
+                    <span class="balance-item">{{ 'LIM_debit' | translate }}</span>
+                    <span class="text-primary"><input type="text" id="limitM" max="0" ng-model="pop_limitCMm"  ng-pattern="/^[0-9]+(\.[0-9]{1,2})?$/" value="{{pop_limitCMm}}"/>  {{ 'CUR' | translate }}</span>
+                           
+                           </p>
+    
+                      
+                        <div ng-bind-html="pop_message" style="text-align:center;font-size:large;"></div> 
+                      </div> 
+                      
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="EXC_cancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="confirmUpdate()" translate="EXC_confirm">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div> 
+     
+    
+  
+         <!-- Confrim Credit -->
+         <div class="modal fade" id="confCredit" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="EXC_ConfirmCreditAccountTitle">Confirm Credit Account</label></p>
+                           <p> <span translate="EXC_CreditAmount" ></span> <span class="text-primary"> {{credit_amount}}  <span translate="CUR"> </span></span>   </p>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="EXC_cancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="confirmCreditAccount()" translate="EXC_confirm" ng-show="credit_amount>0">Sauver</button>
+                      </div>
+                  </div>
+              </div>
+        </div> 
+        
+        <waiting-drtv></waiting-drtv> 
+     
+    </div>
+</div> 
+  
+    <!-- Action on another Account-->
+<div class="tab-pane active" ng-if="globalService.currentTab==globalService.tabs.global.id">
+  <div>
+    <wallet-decrypt-drtv></wallet-decrypt-drtv>
+  </div>
+       
+  <div ng-show="wallet!=null" ng-controller='globalCtrl'>
+     <section class="row" ng-hide="is_owner" >
+          <div class="col-md-12 ">
+              <div class="row grp"> 
+                 <div class="col-md-12 ">
+                     <label translate="GLB_Not_owner" >Not Owner</label>
+                  </div>
+              </div>
+          </div>
+      </section>  
+      <section class="row" ng-show="is_owner">
+          <div class="col-md-12 ">
+              <div class="row grp"> 
+                 <div class="col-md-6 col-xs-6">
+                     <label translate="GLB_Taxes" >Taxes :</label>
+                  </div>
+                   <div  class="col-md-6 col-xs-6">
+                    <a class="btn btn-primary btn-block" ng-click="refresh()" translate="EXC_Refresh">Refresh </a>
+                   </div>
+                  <div class="col-md-12 ">
+                  <br/>
+                    <div ng-bind-html="validateStatus"></div>
+                  </div>
+                  
+                  <div  class="col-md-12 " >
+                        <span translate="GLB_tax_amount"> </span>
+
+                  </div> 
+                  <div  class="col-md-6 col-xs-6 text-primary">
+                        {{taxes_amount}}<span translate="GLB_percent"> </span>
+
+                  </div>
+                  <div  class="col-md-6 col-xs-6">
+                    <a class="btn btn-primary btn-block" ng-click="updateTax()" translate="GLB_update_tax">Update </a>
+                  </div>
+                  
+                 <br/>
+          
+                  
+                  
+                   <div  class="col-md-12 " >
+                        <span translate="GLB_tax_amount_leg"> </span>
+
+                  </div> 
+                  <div  class="col-md-6 col-xs-6 text-primary">
+                        {{taxes_amount_leg}}<span translate="GLB_percent"> </span>
+
+                  </div>
+                  <div  class="col-md-6 col-xs-6">
+                    <a class="btn btn-primary btn-block" ng-click="updateTaxLeg()" translate="GLB_update_tax">Update </a>
+                  </div>  
+                  
+                 
+                 <br/>
+                 
+                  <div  class="col-md-12 ">
+                        <span translate="GLB_tax_account">  </span>
+                  </div>
+                  
+                  
+                  <div   class="col-md-6 col-xs-6">
+                       <div class="identiconWrapper" style="max-width:100px;" >
+                                    <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{tax_account}}"  
+                                        watch-var="tax_account" ">
+                                    </div>
+                         </div>
+                         <textarea cols="9" rows="5" class="adrtxt" disabled>{{tax_account}} </textarea>
+                  </div>
+                   <div  class="col-md-6 col-xs-6">
+                    &nbsp;
+                    <br/>
+                    <a class="btn btn-primary btn-block" ng-click="updateTaxAcc()" translate="GLB_update_tax_acc">Refresh </a>
+                  </div>
+                                      
+              </div>
+              
+              <div class="row grp"> 
+                 <div class="col-md-12 ">
+                     <label translate="GLB_Ownership" >Ownership :</label>
+                  </div>
+                  
+                  <div  class="col-md-6 col-xs-6">
+                        <div class="identiconWrapper" style="max-width:100px;" >
+                                    <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{owner_account}}"  
+                                        watch-var="owner_account" ">
+                                    </div>
+                         </div>
+                         <textarea cols="9" rows="5" class="adrtxt" disabled>{{owner_account}} </textarea>
+
+                  </div>
+                       <div  class="col-md-6 col-xs-6">
+                    <a class="btn btn-primary btn-block" ng-click="updateOwnAcc()" translate="GLB_update_Own_acc">Refresh </a>
+                  </div>
+              </div>
+              
+          </div>
+      </section> 
+       
+     <!-- Confrim Taxes -->
+     <div class="modal fade" id="confTax" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="GLB_Change_tax">Confirm Tax</label></p>
+                           <p> <span translate="GLB_NewTaxAmount" ></span> <span class="text-primary"> 
+                                   <input class="form-control" type="text" placeholder="0" ng-model="new_tax_amount"/>  
+                                   <span translate="GLB_percent"> </span>
+                               </span>  
+                            </p>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="GLB_cancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="confirmTax()" translate="GLB_confirm" ng-show="new_tax_amount >= 0" >Sauver</button>
+                      </div>
+                  </div>
+              </div>
+       </div> 
+       
+            <!-- Confrim Taxes -->
+     <div class="modal fade" id="confTaxLeg" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="GLB_Change_tax_leg">Confirm Tax</label></p>
+                           <p> <span translate="GLB_NewTaxAmount" ></span> <span class="text-primary"> 
+                                   <input class="form-control" type="text" placeholder="0" ng-model="new_tax_amount_leg"/>  
+                                   <span translate="GLB_percent"> </span>
+                               </span>  
+                            </p>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="GLB_cancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="confirmTaxLeg()" translate="GLB_confirm" ng-show="new_tax_amount_leg >= 0" >Sauver</button>
+                      </div>
+                  </div>
+              </div>
+       </div> 
+       
+     <!-- Confrim Taxes Account       -->
+     <div class="modal fade" id="confTaxAccount" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="GLB_Change_tax_Account">Confirm Tax_account</label></p>
+                           <div class="identiconWrapper" style="max-width:100px;" >
+                                    <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{new_tax_account}}"   
+                                         ng-click="startScanToAddressTax()"  watch-var="new_tax_account" >
+                                    </div>
+                           </div>
+                           
+                           <textarea cols="9" rows="5" class="adrtxt" ng-model="new_tax_account" >{{new_tax_account}} </textarea>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="GLB_cancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="confirmTaxAccount()" translate="GLB_confirm"  >Sauver</button>
+                      </div>
+                  </div>
+              </div>
+       </div> 
+       
+        <!-- Confrim Owner Account       -->
+     <div class="modal fade" id="confOwnerAccount" tabindex="-1" role="dialog" aria-labelledby="sendTransactionLabel">
+              <div class="modal-dialog" role="document">
+                  <div class="modal-content">
+                      <div class="modal-header">
+                          <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                      </div>
+                      <div class="modal-body">
+                          <h4 align="center">
+                           <p><label translate="GLB_Change_owner_Account">Confirm owner_account</label></p>
+                           <div class="identiconWrapper" style="max-width:100px;" >
+                                    <div id="addressIdenticon" title="Address Indenticon" img="1" blockie-address="{{new_owner_account}}"  
+                                        ng-click="startScanToAddressOwn()" watch-var="new_owner_account" >
+                                    </div>
+                           </div>
+                           
+                           <textarea cols="9" rows="5" class="adrtxt" ng-model="new_owner_account" >{{new_owner_account}} </textarea>
+                             
+                          </h4>
+                      </div>
+                      <div class="modal-footer text-center">
+                          <button type="button" class="btn btn-default" data-dismiss="modal" translate="GLB_cancel">Annuler </button>
+                          <button type="button" class="btn btn-primary" ng-click="confirmOwnerAccount()" translate="GLB_confirm"  >Sauver</button>
+                      </div>
+                  </div>
+              </div>
+       </div> 
+       <waiting-drtv></waiting-drtv> 
+    </div>
+</div> 
+
+
+    <div class="tab-pane active"  ng-controller='viewCtrl'  >
+    <!-- Ecran initial: creation du porte-feuille -->
+    <div ng-if="globalService.currentTab==globalService.tabs.help1.id">
+     <div class="row grp" > 
+      <div class="col-md-12 ">
+       <div class="row "> 
+        <div class="col-md-12 "> 
+         <div ng-bind-html="'HELP_1' | translate"></div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+   <div ng-if="globalService.currentTab==globalService.tabs.help2.id">
+     <div class="row grp" > 
+      <div class="col-md-12 ">
+       <div class="row "> 
+        <div class="col-md-12 "> 
+         <div ng-bind-html="'HELP_2' | translate"></div>
+        </div>
+       </div>
+      </div>
+     </div>
+    </div>
+</div>
+
+
+
+
+
+
+  </div> 
+
+</section>
+

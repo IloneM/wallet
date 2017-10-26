@@ -1,0 +1,26 @@
+@@include( '../includes/header.tpl', { "site": "readOnly", "lang":"fr,Français" } )
+
+
+
+<br />
+
+<section class="container" style="min-height: 50%" ng-controller='viewCtrl'>
+
+  <div class="tab-content" >
+
+    @@include( '../includes/storage.tpl', { "site": "readOnly" } )
+
+    @@include( '../includes/viewWalletInfo.tpl', { "site": "readOnly" } )
+
+    @@include( '../includes/balance.tpl', { "site": "readOnly" , "currency_selection":"NCM", "delegation":"false","allowance":"false"} )
+    
+    @@include( '../includes/transactionsDetailed.tpl', { "site": "readOnly" } )
+    
+    @@include( '../includes/contacts.tpl', { "site": "readOnly" } )
+
+    @@include( '../includes/help.tpl', { "site": "readOnly" } )
+    
+  </div>
+  
+</section>
+

@@ -1,0 +1,27 @@
+In order to process the sources you need npm and gulp 
+(and the gulp packages: 
+gulp-less, 
+gulp-autoprefixer
+gulp-cssnano
+gulp-notify
+gulp-rename
+gulp-util
+gulp-concat
+gulp-clean
+gulp-uglify
+gulp-shell
+gulp-file-include
+gulp-babel)
+
+Then you need the following npm modules installed locally before running gulp:
+
+npm install babel-polyfill
+npm install angular
+npm install angular-sanitize
+npm install angular-translate
+npm install angular-translate-handler-log
+npm install bignumber.js
+npm install ethereumjs-tx
+npm install babel-cli
+npm install babel-preset-env
+npm install scryptsy
