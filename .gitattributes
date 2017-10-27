@@ -1,1 +1,8 @@
 cordova_dist/plugins/* linguist-vendored
+cordova_dist/platforms/* linguist-vendored
+cordova_dist_ios/plugins/* linguist-vendored
+cordova_dist_ios/platforms/* linguist-vendored
+cordova_exchange_dist/plugins/* linguist-vendored
+cordova_exchange_dist/platforms/* linguist-vendored
+cordova_readonly_dist/plugins/* linguist-vendored
+cordova_readonly_dist/platforms/* linguist-vendored
